@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OutputModel {
-    public String massage;
+public class OutputResponse {
+    public String message;
 }

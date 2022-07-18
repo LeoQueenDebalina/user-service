@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "User")
 @Builder
-public class UserDatabase {
+public class UserEntity {
     @Id
     @Column(name = "userPh",length = 100)
     private String userPh;

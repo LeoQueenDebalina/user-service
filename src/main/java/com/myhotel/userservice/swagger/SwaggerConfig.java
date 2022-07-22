@@ -15,20 +15,21 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
     @Bean
-    public Docket api(){
+    public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("user-service")
                 .select().apis(RequestHandlerSelectors.basePackage("com.myhotel.userservice"))
                 .paths(PathSelectors.any())
                 .build().apiInfo(metaData());
     }
-    private ApiInfo metaData(){
+
+    private ApiInfo metaData() {
         return new ApiInfoBuilder().title("USER Service")
                 .description("Sample Documentation Generated For User Services Using SWAGGER2 for our Book Rest API")
                 .termsOfServiceUrl("https://www.google.com")
                 .license("Java License")
                 .licenseUrl("https://www.google.com")
-                .contact(new Contact("Debalina","www.debalina.com","debalina@gmail.com"))
+                .contact(new Contact("Debalina", "www.debalina.com", "debalina@gmail.com"))
                 .version("1.0").build();
     }
 }

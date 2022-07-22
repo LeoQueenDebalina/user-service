@@ -1,0 +1,19 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    driver:
+      class: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/hotel_db
+    username: debalina
+    password: debalina
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher

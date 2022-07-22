@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OutputResponse {
-    public String message;
+    private Boolean error;
+    private String message;
 }

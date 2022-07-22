@@ -2,67 +2,61 @@ package com.myhotel.userservice.service;
 
 import com.myhotel.userservice.entity.UserEntity;
 import com.myhotel.userservice.model.InputRequest;
+import com.myhotel.userservice.model.OutputResponse;
 import com.myhotel.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private String message;
     @Autowired
     private UserRepository userRepository;
 
-    public String saveUser(InputRequest inputRequest) {
-        List list = Arrays.asList(inputRequest);
+    public OutputResponse saveUser(InputRequest inputRequest) {
         UUID uuid = UUID.randomUUID();
-        if(this.userRepository.findByByMNumber(inputRequest.getUserPh())){
-            message = "Your account is already exist.";
+        if(this.userRepository.ifExitsNumber(inputRequest.getUserPhoneNumber())){
+            return new OutputResponse(true,"Your account is already exist.");
         }else{
-            List<UserEntity> data = (List<UserEntity>) list.stream().map(e-> UserEntity
-                    .builder().userPh(inputRequest.getUserPh())
+            userRepository.save(UserEntity
+                    .builder().userPhoneNumber(inputRequest.getUserPhoneNumber())
                     .uuid(String.valueOf(uuid))
-                    .userName(inputRequest.getUserName())
+                    .userFullName(inputRequest.getUserFullName())
                     .userAddress(inputRequest.getUserAddress())
                     .userDOB(inputRequest.getUserDOB())
-                    .userEmail(inputRequest.getUserEmail())
+                    .userEmailId(inputRequest.getUserEmailId())
                     .userGender(inputRequest.getUserGender())
-                    .build()).collect(Collectors.toList());
-            userRepository.saveAll(data);
-            message = "your data are saved";
+                    .build());
+            return new OutputResponse(false,"your data are saved");
         }
-        return message;
     }
-    public String updateUser(InputRequest inputRequest) {
-        List list = Arrays.asList(inputRequest);
-        List<UserEntity> test = this.userRepository.selectAllByNumber(inputRequest.getUserPh());
+    public OutputResponse updateUser(InputRequest inputRequest) {
+        List<UserEntity> test = this.userRepository.selectAllByNumber(inputRequest.getUserPhoneNumber());
         if(test.size() != 0) {
             for (UserEntity u : test) {
-                List<UserEntity> data = (List<UserEntity>) list.stream().map(e-> UserEntity
-                        .builder().userPh(inputRequest.getUserPh())
+                userRepository.save(UserEntity
+                        .builder().userPhoneNumber(inputRequest.getUserPhoneNumber())
                         .uuid(u.getUuid())
-                        .userName(inputRequest.getUserName())
+                        .userFullName(inputRequest.getUserFullName())
                         .userAddress(inputRequest.getUserAddress())
                         .userDOB(inputRequest.getUserDOB())
-                        .userEmail(inputRequest.getUserEmail())
+                        .userEmailId(inputRequest.getUserEmailId())
                         .userGender(inputRequest.getUserGender())
-                        .build()).collect(Collectors.toList());
-                userRepository.saveAll(data);
-                message = "your data are updated";
+                        .build());
+                return new OutputResponse(false,"Your data are updated");
             }
         }else{
-            message = "Your phone number not found.";
+            return new OutputResponse(true,"Your phone number not found.");
         }
-        return message;
+        return new OutputResponse(true,"Fall to update.");
     }
 
     public String getUserIdByNumber(String number) {
-        if (this.userRepository.findByByMNumber(number)) {
+        if (this.userRepository.ifExitsNumber(number)) {
             return this.userRepository.getUserIdByNumber(number);
         }else{
-            return  null;
+            return null;
         }
     }
 }

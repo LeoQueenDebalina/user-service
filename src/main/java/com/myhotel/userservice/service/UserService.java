@@ -21,7 +21,7 @@ public class UserService {
 
     public OutputResponse saveUser(InputRequest inputRequest) {
         UUID uuid = UUID.randomUUID();
-        if (this.userRepository.ifExitsNumber(inputRequest.getUserPhoneNumber())) {
+        if (this.userRepository.existsUserEntityByUserPhoneNumber(inputRequest.getUserPhoneNumber())) {
             return new OutputResponse(true, "Your account is already exist.");
         } else {
             userRepository.save(UserEntity
@@ -38,38 +38,35 @@ public class UserService {
     }
 
     public OutputResponse updateUser(InputRequest inputRequest) {
-        List<UserEntity> test = this.userRepository.selectAllByNumber(inputRequest.getUserPhoneNumber());
-        if (test.size() != 0) {
-            for (UserEntity u : test) {
-                userRepository.save(UserEntity
-                        .builder().userPhoneNumber(inputRequest.getUserPhoneNumber())
-                        .uuid(u.getUuid())
-                        .userFullName(inputRequest.getUserFullName())
-                        .userAddress(inputRequest.getUserAddress())
-                        .userDOB(inputRequest.getUserDOB())
-                        .userEmailId(inputRequest.getUserEmailId())
-                        .userGender(inputRequest.getUserGender())
-                        .build());
-                return new OutputResponse(false, "Your data are updated");
-            }
+        UserEntity test = this.userRepository.findByUserPhoneNumber(inputRequest.getUserPhoneNumber());
+        if (test != null) {
+            userRepository.save(UserEntity
+                    .builder().userPhoneNumber(inputRequest.getUserPhoneNumber())
+                    .uuid(test.getUuid())
+                    .userFullName(inputRequest.getUserFullName())
+                    .userAddress(inputRequest.getUserAddress())
+                    .userDOB(inputRequest.getUserDOB())
+                    .userEmailId(inputRequest.getUserEmailId())
+                    .userGender(inputRequest.getUserGender())
+                    .build());
+            return new OutputResponse(false, "Your data are updated");
         } else {
             return new OutputResponse(true, "Your phone number not found.");
         }
-        return new OutputResponse(true, "Fall to update.");
     }
 
     public String getUserIdByNumber(String number) {
-        if (this.userRepository.ifExitsNumber(number)) {
-            return this.userRepository.getUserIdByNumber(number);
+        if (this.userRepository.existsUserEntityByUserPhoneNumber(number)) {
+            return this.userRepository.findByUserPhoneNumber(number).getUuid();
         } else {
             return null;
         }
     }
 
     public ViewOutputResponse getUserDetailsByNumber(ViewInputRequest viewInputRequest) throws NoDataFoundException {
-        Optional<UserEntity> data = this.userRepository.findById(viewInputRequest.getUserPhoneNumber());
-        if (data.isPresent()) {
-            return new ViewOutputResponse(data.get().getUserPhoneNumber(), data.get().getUserFullName(), data.get().getUserEmailId(), data.get().getUserGender(), data.get().getUserDOB(), data.get().getUserAddress());
+        UserEntity data = this.userRepository.findByUserPhoneNumber(viewInputRequest.getUserPhoneNumber());
+        if (data != null) {
+            return new ViewOutputResponse(data.getUserPhoneNumber(), data.getUserFullName(), data.getUserEmailId(), data.getUserGender(), data.getUserDOB(), data.getUserAddress());
         } else {
             throw new NoDataFoundException("Your account Not Found.");
         }
@@ -77,7 +74,7 @@ public class UserService {
 
     public ResponseEntity<String> deleteById(String number) {
         try {
-            this.userRepository.deleteById(number);
+            this.userRepository.deleteById(userRepository.findByUserPhoneNumber(number).getUuid());
             return new ResponseEntity<>("Your account is Deleted", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Your account is not found.", HttpStatus.BAD_GATEWAY);
